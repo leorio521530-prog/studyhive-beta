@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyHive — Find a study group</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo/logo-mark.svg" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="brand">
+      <img src="assets/logo/logo-mark.svg" alt="" class="brand-icon" width="28" height="28" />
+      StudyHive
+    </a>
+    <div class="nav-links">
+      <a id="nav-create-post" href="pages/create-post.html" class="btn-nav-primary" style="display: none;">Create Post</a>
+      <a id="nav-login" href="pages/login.html" style="display: none;">Log in</a>
+      <a id="nav-signup" href="pages/signup.html" style="display: none;">Sign up</a>
+      <button id="nav-logout" class="btn-link" style="display: none;">Log out</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-text">
+      <p class="hero-eyebrow">No app to join, no group to manage</p>
+      <h1>Find your study crew.</h1>
+      <p class="hero-subtitle">Browse open study sessions or pin your own — then take the conversation to your Telegram or LINE group.</p>
+      <div class="hero-actions">
+        <a href="pages/create-post.html" class="btn-primary hero-btn">Post a study group</a>
+        <a href="#feed-grid" class="btn-secondary hero-btn">Browse groups ↓</a>
+      </div>
+    </div>
+    <svg class="hero-art" viewBox="0 0 220 210" aria-hidden="true">
+      <polygon points="150,40 172,53 172,79 150,92 128,79 128,53" fill="#FDE9C7" opacity="0.9"/>
+      <polygon points="188,95 210,108 210,134 188,147 166,134 166,108" fill="#F0DFC0"/>
+      <polygon points="105,70 133,86 133,118 105,134 77,118 77,86" fill="#E8A33D"/>
+      <polygon points="55,120 83,136 83,168 55,184 27,168 27,136" fill="#B45309"/>
+      <polygon points="120,140 148,156 148,188 120,204 92,188 92,156" fill="#7FA86B" opacity="0.85"/>
+      <polygon points="97,90 112,98.5 112,115.5 97,124 82,115.5 82,98.5" fill="none" stroke="#FFFBF3" stroke-width="2"/>
+    </svg>
+  </section>
+
+  <main class="feed-page">
+    <div class="feed-header">
+      <div>
+        <h2>Open study groups</h2>
+        <p class="feed-subtitle">Tap a card to see the full details and group link.</p>
+      </div>
+    </div>
+
+    <!-- Role 4 (Subject Filter) hooks in here with a <select> dropdown -->
+    <div id="filter-container"></div>
+
+    <div id="feed-grid" class="feed-grid"></div>
+  </main>
+
+  <script type="module" src="js/nav.js"></script>
+  <!-- filter.js imports feed.js internally, so this one tag loads both -->
+  <script type="module" src="js/filter.js"></script>
+
+</body>
+</html>
