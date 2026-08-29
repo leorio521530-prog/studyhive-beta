@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log in — StudyHive</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo/logo-mark.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="brand">
+      <img src="../assets/logo/logo-mark.svg" alt="" class="brand-icon" width="28" height="28" />
+      StudyHive
+    </a>
+    <div class="nav-links">
+      <a id="nav-create-post" href="create-post.html" class="btn-nav-primary" style="display: none;">Create Post</a>
+      <a id="nav-login" href="login.html" style="display: none;">Log in</a>
+      <a id="nav-signup" href="signup.html">Sign up</a>
+      <button id="nav-logout" class="btn-link" style="display: none;">Log out</button>
+    </div>
+  </nav>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <h1>Welcome back</h1>
+      <p class="subtitle">Log in to post or browse study groups.</p>
+
+      <div id="message" class="message"></div>
+
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password" />
+        </div>
+
+        <button type="submit" class="btn-primary" id="submit-btn">Log in</button>
+      </form>
+
+      <p class="auth-footer">
+        Don't have an account? <a href="signup.html">Sign up</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module" src="../js/nav.js"></script>
+
+  <script type="module">
+    import { signIn, getFriendlyAuthError } from '../js/auth.js';
+
+    const form = document.getElementById('login-form');
+    const messageEl = document.getElementById('message');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function showMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = `message ${type}`;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Logging in...';
+      messageEl.className = 'message';
+
+      const { user, error } = await signIn(email, password);
+
+      if (error) {
+        showMessage(getFriendlyAuthError(error), 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Log in';
+        return;
+      }
+
+      showMessage('Logged in! Redirecting...', 'success');
+      // Redirect to the home feed once it exists.
+      window.location.href = '../index.html';
+    });
+  </script>
+
+</body>
+</html>

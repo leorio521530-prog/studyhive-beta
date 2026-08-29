@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create a post — StudyHive</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo/logo-mark.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="brand">
+      <img src="../assets/logo/logo-mark.svg" alt="" class="brand-icon" width="28" height="28" />
+      StudyHive
+    </a>
+    <div class="nav-links">
+      <a id="nav-create-post" href="create-post.html" class="btn-nav-primary" style="display: none;">Create Post</a>
+      <a id="nav-login" href="login.html" style="display: none;">Log in</a>
+      <a id="nav-signup" href="signup.html" style="display: none;">Sign up</a>
+      <button id="nav-logout" class="btn-link" style="display: none;">Log out</button>
+    </div>
+  </nav>
+
+  <div class="auth-wrapper">
+
+    <!-- Shown only if the user is not logged in -->
+    <div class="auth-card" id="logged-out-notice" style="display: none;">
+      <h1>Log in to create a post</h1>
+      <p class="subtitle">You need an account to post a study group.</p>
+      <a href="login.html" class="btn-primary" style="display: block; text-align: center; text-decoration: none;">Log in</a>
+      <p class="auth-footer">
+        Don't have an account? <a href="signup.html">Sign up</a>
+      </p>
+    </div>
+
+    <!-- Shown only if the user is logged in -->
+    <div class="auth-card" id="create-post-card" style="display: none; max-width: 520px;">
+      <h1>Post a study group</h1>
+      <p class="subtitle">Share what you're studying and drop your Telegram or LINE link.</p>
+
+      <div id="message" class="message"></div>
+
+      <form id="create-post-form" novalidate>
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" required placeholder="e.g. Weekly Calc II Review Session" />
+        </div>
+
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <select id="subject" name="subject" required>
+            <option value="" disabled selected>Select a subject</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" required placeholder="What will you cover, and who's it for? Paste your Telegram or LINE group link here too, e.g. https://t.me/yourgroup"></textarea>
+          <span class="field-hint">Tip: include the full link (with https://) so it's easy for others to detect and open.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="schedule">Schedule (optional)</label>
+          <input type="text" id="schedule" name="schedule" placeholder="e.g. Wednesdays 6pm" />
+        </div>
+
+        <button type="submit" class="btn-primary" id="submit-btn">Post study group</button>
+      </form>
+    </div>
+
+  </div>
+
+  <script type="module" src="../js/nav.js"></script>
+
+  <script type="module">
+    import { supabase } from '../js/supabaseClient.js';
+    import { getCurrentUser } from '../js/auth.js';
+    import { SUBJECTS } from '../js/constants.js';
+
+    const loggedOutNotice = document.getElementById('logged-out-notice');
+    const createPostCard = document.getElementById('create-post-card');
+    const subjectSelect = document.getElementById('subject');
+    const form = document.getElementById('create-post-form');
+    const messageEl = document.getElementById('message');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function showMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = `message ${type}`;
+    }
+
+    function populateSubjects() {
+      SUBJECTS.forEach((subject) => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectSelect.appendChild(option);
+      });
+    }
+
+    async function init() {
+      const user = await getCurrentUser();
+
+      if (!user) {
+        loggedOutNotice.style.display = 'block';
+        return;
+      }
+
+      createPostCard.style.display = 'block';
+      populateSubjects();
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const title = document.getElementById('title').value.trim();
+        const subject = subjectSelect.value;
+        const description = document.getElementById('description').value.trim();
+        const schedule = document.getElementById('schedule').value.trim();
+
+        if (!title || !subject || !description) {
+          showMessage('Please fill in title, subject, and description.', 'error');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Posting...';
+        messageEl.className = 'message';
+
+        const { data, error } = await supabase
+          .from('study_posts')
+          .insert([{
+            title,
+            subject,
+            description,
+            schedule: schedule || null,
+            owner_id: user.id,
+          }])
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error creating post:', error);
+          showMessage('Something went wrong posting your study group. Please try again.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Post study group';
+          return;
+        }
+
+        showMessage('Posted! Redirecting to the feed...', 'success');
+        // Once Role 6 (post detail page) exists, this can redirect straight
+        // to `post-detail.html?id=${data.id}` instead of the home feed.
+        setTimeout(() => {
+          window.location.href = '../index.html';
+        }, 800);
+      });
+    }
+
+    init();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign up — StudyHive</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo/logo-mark.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="brand">
+      <img src="../assets/logo/logo-mark.svg" alt="" class="brand-icon" width="28" height="28" />
+      StudyHive
+    </a>
+    <div class="nav-links">
+      <a id="nav-create-post" href="create-post.html" class="btn-nav-primary" style="display: none;">Create Post</a>
+      <a id="nav-login" href="login.html">Log in</a>
+      <a id="nav-signup" href="signup.html" style="display: none;">Sign up</a>
+      <button id="nav-logout" class="btn-link" style="display: none;">Log out</button>
+    </div>
+  </nav>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <h1>Create your account</h1>
+      <p class="subtitle">Join StudyHive to post or find study groups.</p>
+
+      <div id="message" class="message"></div>
+
+      <form id="signup-form" novalidate>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required minlength="6" autocomplete="new-password" />
+        </div>
+
+        <div class="form-group">
+          <label for="confirm-password">Confirm password</label>
+          <input type="password" id="confirm-password" name="confirm-password" required minlength="6" autocomplete="new-password" />
+        </div>
+
+        <button type="submit" class="btn-primary" id="submit-btn">Sign up</button>
+      </form>
+
+      <p class="auth-footer">
+        Already have an account? <a href="login.html">Log in</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module" src="../js/nav.js"></script>
+
+  <script type="module">
+    import { signUp, getFriendlyAuthError } from '../js/auth.js';
+
+    const form = document.getElementById('signup-form');
+    const messageEl = document.getElementById('message');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function showMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = `message ${type}`;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+
+      if (password !== confirmPassword) {
+        showMessage('Passwords do not match.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account...';
+      messageEl.className = 'message';
+
+      const { user, error } = await signUp(email, password);
+
+      if (error) {
+        showMessage(getFriendlyAuthError(error), 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign up';
+        return;
+      }
+
+      // If email confirmation is enabled in Supabase, the user must verify
+      // their email before they can log in. If it's disabled, they're
+      // signed in immediately and can go straight to the app.
+      if (user && !user.confirmed_at) {
+        showMessage('Account created! Check your email to confirm before logging in.', 'success');
+        form.reset();
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign up';
+      } else {
+        showMessage('Account created! Redirecting...', 'success');
+        window.location.href = '../index.html';
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study post — StudyHive</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo/logo-mark.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="brand">
+      <img src="../assets/logo/logo-mark.svg" alt="" class="brand-icon" width="28" height="28" />
+      StudyHive
+    </a>
+    <div class="nav-links">
+      <a id="nav-create-post" href="create-post.html" class="btn-nav-primary" style="display: none;">Create Post</a>
+      <a id="nav-login" href="login.html" style="display: none;">Log in</a>
+      <a id="nav-signup" href="signup.html" style="display: none;">Sign up</a>
+      <button id="nav-logout" class="btn-link" style="display: none;">Log out</button>
+    </div>
+  </nav>
+
+  <main class="post-detail-page">
+    <a href="../index.html" class="back-link">← Back to feed</a>
+    <div id="post-detail-content"></div>
+  </main>
+
+  <script type="module" src="../js/nav.js"></script>
+  <script type="module" src="../js/post-detail.js"></script>
+
+</body>
+</html>

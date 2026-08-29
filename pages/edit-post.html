@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit post — StudyHive</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo/logo-mark.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="brand">
+      <img src="../assets/logo/logo-mark.svg" alt="" class="brand-icon" width="28" height="28" />
+      StudyHive
+    </a>
+    <div class="nav-links">
+      <a id="nav-create-post" href="create-post.html" class="btn-nav-primary" style="display: none;">Create Post</a>
+      <a id="nav-login" href="login.html" style="display: none;">Log in</a>
+      <a id="nav-signup" href="signup.html" style="display: none;">Sign up</a>
+      <button id="nav-logout" class="btn-link" style="display: none;">Log out</button>
+    </div>
+  </nav>
+
+  <div class="auth-wrapper">
+
+    <!-- Shown if the post doesn't exist, or the logged-in user isn't the owner -->
+    <div class="auth-card" id="blocked-notice" style="display: none;">
+      <h1 id="blocked-title">Can't edit this post</h1>
+      <p class="subtitle" id="blocked-message">You don't have permission to edit this post.</p>
+      <a href="../index.html" class="btn-primary" style="display: block; text-align: center; text-decoration: none;">Back to feed</a>
+    </div>
+
+    <!-- Shown once we've confirmed the current user owns this post -->
+    <div class="auth-card" id="edit-post-card" style="display: none; max-width: 520px;">
+      <h1>Edit study post</h1>
+      <p class="subtitle">Update the details below.</p>
+
+      <div id="message" class="message"></div>
+
+      <form id="edit-post-form" novalidate>
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" required />
+        </div>
+
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <select id="subject" name="subject" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" required></textarea>
+          <span class="field-hint">Tip: include the full link (with https://) so it's easy for others to detect and open.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="schedule">Schedule (optional)</label>
+          <input type="text" id="schedule" name="schedule" />
+        </div>
+
+        <button type="submit" class="btn-primary" id="submit-btn">Save changes</button>
+      </form>
+    </div>
+
+  </div>
+
+  <script type="module" src="../js/nav.js"></script>
+
+  <script type="module">
+    import { supabase } from '../js/supabaseClient.js';
+    import { getCurrentUser } from '../js/auth.js';
+    import { SUBJECTS } from '../js/constants.js';
+
+    const blockedNotice = document.getElementById('blocked-notice');
+    const blockedTitle = document.getElementById('blocked-title');
+    const blockedMessage = document.getElementById('blocked-message');
+    const editPostCard = document.getElementById('edit-post-card');
+    const subjectSelect = document.getElementById('subject');
+    const form = document.getElementById('edit-post-form');
+    const messageEl = document.getElementById('message');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function showMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = `message ${type}`;
+    }
+
+    function showBlocked(title, message) {
+      blockedTitle.textContent = title;
+      blockedMessage.textContent = message;
+      blockedNotice.style.display = 'block';
+    }
+
+    function populateSubjects(selected) {
+      SUBJECTS.forEach((subject) => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        option.selected = subject === selected;
+        subjectSelect.appendChild(option);
+      });
+    }
+
+    async function init() {
+      const postId = new URLSearchParams(window.location.search).get('id');
+      if (!postId) {
+        showBlocked('Post not found', 'No post ID was provided.');
+        return;
+      }
+
+      const [{ data: post, error }, user] = await Promise.all([
+        supabase.from('study_posts').select('*').eq('id', postId).single(),
+        getCurrentUser(),
+      ]);
+
+      if (error || !post) {
+        showBlocked('Post not found', 'This study post may have been deleted.');
+        return;
+      }
+
+      if (!user || user.id !== post.owner_id) {
+        showBlocked("Can't edit this post", 'You can only edit posts you created.');
+        return;
+      }
+
+      // Pre-fill the form with the existing post's data.
+      document.getElementById('title').value = post.title;
+      document.getElementById('description').value = post.description;
+      document.getElementById('schedule').value = post.schedule ?? '';
+      populateSubjects(post.subject);
+
+      editPostCard.style.display = 'block';
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const title = document.getElementById('title').value.trim();
+        const subject = subjectSelect.value;
+        const description = document.getElementById('description').value.trim();
+        const schedule = document.getElementById('schedule').value.trim();
+
+        if (!title || !subject || !description) {
+          showMessage('Please fill in title, subject, and description.', 'error');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
+        messageEl.className = 'message';
+
+        const { error: updateError } = await supabase
+          .from('study_posts')
+          .update({ title, subject, description, schedule: schedule || null })
+          .eq('id', postId);
+
+        if (updateError) {
+          console.error('Error updating post:', updateError);
+          showMessage('Something went wrong saving your changes. Please try again.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Save changes';
+          return;
+        }
+
+        showMessage('Saved! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = `post-detail.html?id=${encodeURIComponent(postId)}`;
+        }, 600);
+      });
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
