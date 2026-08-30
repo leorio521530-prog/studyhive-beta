@@ -710,8 +710,27 @@ textarea:focus-visible {
     flex-direction: column;
   }
 
+  .navbar .nav-links a,
+  .navbar .nav-links button {
+    padding: 10px 14px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn-nav-primary {
+    padding: 10px 16px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .subject-filter-select {
+    padding: 13px 14px;
+  }
+
   .post-actions .btn-secondary,
   .post-actions .btn-danger {
+    padding: 13px 18px;
     width: 100%;
     text-align: center;
   }
