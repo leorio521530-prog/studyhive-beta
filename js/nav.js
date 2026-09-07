@@ -37,7 +37,7 @@ export async function initNav() {
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
       await signOutUser();
-      window.location.href = '/index.html';
+      window.location.href = 'studyhive-beta/index.html';
     });
   }
 }
