@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StudyHive — Find a study group</title>
   <link rel="icon" type="image/svg+xml" href="assets/logo/logo-mark.svg" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#B45309" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -96,6 +99,7 @@
   <script type="module" src="js/nav.js"></script>
   <!-- filter.js imports feed.js internally, so this one tag loads both -->
   <script type="module" src="js/filter.js"></script>
+  <script src="js/sw-register.js" data-sw-path="./service-worker.js"></script>
 
 </body>
 </html>
