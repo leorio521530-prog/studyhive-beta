@@ -735,3 +735,71 @@ textarea:focus-visible {
     text-align: center;
   }
 }
+
+/* ===== Site footer + team list ===== */
+.site-footer {
+  margin-top: 60px;
+  padding: 32px 24px 40px;
+  border-top: 1px solid #EADFC8;
+  background: #FFF7E8;
+  text-align: center;
+}
+
+.footer-team-label {
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #92400E;
+  margin: 0 0 14px;
+}
+
+.team-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 14px;
+  margin: 0 0 20px;
+  padding: 0;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.team-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 14px;
+  background: #FFFBF3;
+  border: 1px solid #EADFC8;
+  border-radius: 10px;
+  min-width: 150px;
+}
+
+.team-name {
+  font-family: var(--font-body, "Work Sans", sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: #2B2118;
+}
+
+.team-id {
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 11px;
+  color: #92400E;
+}
+
+.footer-copyright {
+  font-size: 12px;
+  color: #8A7A5C;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .team-member {
+    min-width: 130px;
+  }
+}
