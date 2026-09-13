@@ -97,18 +97,12 @@
         return;
       }
 
-      // If email confirmation is enabled in Supabase, the user must verify
-      // their email before they can log in. If it's disabled, they're
-      // signed in immediately and can go straight to the app.
-      if (user && !user.confirmed_at) {
-        showMessage('Account created! Check your email to confirm before logging in.', 'success');
-        form.reset();
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Sign up';
-      } else {
-        showMessage('Account created! Redirecting...', 'success');
-        window.location.href = '../index.html';
-      }
+      // Email confirmation is turned off in Supabase (Authentication →
+      // Providers → Email → "Confirm email"), so every successful signup
+      // is immediately logged in — no verification step, straight to the
+      // home feed.
+      showMessage('Account created! Redirecting...', 'success');
+      window.location.href = '../index.html';
     });
   </script>
 
